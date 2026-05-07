@@ -17,11 +17,7 @@ app.use(express.json());
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.log("❌ MongoDB Error:", err));
-  // 👇 ADD THIS PART HERE
   
-app.get("/", (req, res) => {
-  res.send("NewsSenseAI Backend Running 🚀");
-});
 
 /* ===========================
    👤 USER SCHEMA
@@ -134,7 +130,9 @@ app.post("/summarize", async (req, res) => {
 /* ===========================
    🚀 SERVER START
 =========================== */
-
+app.get("/", (req, res) => {
+  res.send("NewsSenseAI Backend Running 🚀");
+});
 app.listen(8000, () => {
   console.log("🚀 Server running on port 8000");
 });

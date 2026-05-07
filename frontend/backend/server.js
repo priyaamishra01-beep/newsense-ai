@@ -92,7 +92,59 @@ app.post("/summarize", async (req, res) => {
 // ================= SERVER =================
 
 const PORT = process.env.PORT || 8000;
+// ================= TEMP AUTH ROUTES =================
 
+// Signup
+app.post("/signup", async (req, res) => {
+
+  try {
+
+    const { name, email, password } = req.body;
+
+    res.json({
+      success: true,
+      user: {
+        name,
+        email,
+      },
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: "Signup failed",
+    });
+
+  }
+
+});
+
+// Login
+app.post("/login", async (req, res) => {
+
+  try {
+
+    const { email } = req.body;
+
+    res.json({
+      success: true,
+      user: {
+        name: email,
+        email,
+      },
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: "Login failed",
+    });
+
+  }
+
+});
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });

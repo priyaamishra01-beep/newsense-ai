@@ -58,7 +58,7 @@ function Dashboard({ user, setUser }) {
 
     try {
 
-      const res = await fetch("http://localhost:8000/summarize", {
+      const res = await fetch("https://newsense-ai-xzx5.onrender.com/summarize", {
 
         method: "POST",
 

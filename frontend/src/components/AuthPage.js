@@ -33,7 +33,7 @@ function AuthPage({ setUser }) {
       const endpoint = isLogin ? "login" : "signup";
 
       const response = await fetch(
-        `http://localhost:8000/${endpoint}`,
+        `https://newsense-ai-xzx5.onrender.com/${endpoint}`,
         {
           method: "POST",
 

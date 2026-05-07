@@ -8,33 +8,32 @@ dotenv.config();
 
 const app = express();
 
+// ================= MIDDLEWARE =================
+
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 8000;
+// ================= DATABASE =================
 
-/* ================= MONGODB ================= */
+mongoose
+  .connect(process.env.Mongo_URI)
+  .then(() => {
+    console.log("✅ MongoDB Connected");
+  })
+  .catch((err) => {
+    console.log("❌ MongoDB Error:", err);
+  });
 
-mongoose.connect(process.env.Mongo_URI)
-.then(() => {
-  console.log("✅ MongoDB Connected");
-})
-.catch((err) => {
-  console.log("❌ MongoDB Error:", err);
-});
-
-/* ================= TEST ROUTE ================= */
+// ================= TEST ROUTE =================
 
 app.get("/", (req, res) => {
   res.send("NewsSenseAI Backend Running 🚀");
 });
 
-/* ================= NEWS ROUTE ================= */
+// ================= NEWS API ROUTE =================
 
 app.get("/news", async (req, res) => {
-
   try {
-
     const query = req.query.q || "india";
 
     const response = await axios.get(
@@ -43,43 +42,56 @@ app.get("/news", async (req, res) => {
 
     res.json(response.data);
 
-  } catch (err) {
+  } catch (error) {
 
-    console.log(err);
+    console.log("❌ News API Error:", error.message);
 
     res.status(500).json({
-      error: "Failed to fetch news"
+      error: "Failed to fetch news",
     });
 
   }
-
 });
 
-/* ================= SUMMARY ROUTE ================= */
+// ================= AI SUMMARY ROUTE =================
 
 app.post("/summarize", async (req, res) => {
-
   try {
 
     const { text } = req.body;
 
+    if (!text) {
+      return res.status(400).json({
+        summary: "No text provided",
+      });
+    }
+
+    // TEMP SIMPLE SUMMARY
+    // Replace later with GROQ/OpenAI if needed
+
+    const shortSummary =
+      text.length > 150
+        ? text.substring(0, 150) + "..."
+        : text;
+
     res.json({
-      summary: text
+      summary: shortSummary,
     });
 
-  } catch (err) {
+  } catch (error) {
 
-    console.log(err);
+    console.log("❌ Summary Error:", error.message);
 
     res.status(500).json({
-      error: "Summary failed"
+      summary: "Failed to generate summary",
     });
 
   }
-
 });
 
-/* ================= START SERVER ================= */
+// ================= SERVER =================
+
+const PORT = process.env.PORT || 8000;
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

@@ -79,35 +79,30 @@ function AuthPage({ setUser }) {
      GOOGLE LOGIN
   ================================= */
 
-  const handleGoogleLogin = async () => {
+ const googleLogin = async () => {
 
-    try {
+  try {
 
-      const result = await signInWithPopup(
-        auth,
-        provider
-      );
+    const result = await signInWithPopup(auth, provider);
 
-      const user = {
-        name: result.user.displayName,
-        email: result.user.email,
-      };
+    const user = {
+      name: result.user.displayName,
+      email: result.user.email,
+    };
 
-      localStorage.setItem(
-        "user",
-        JSON.stringify(user)
-      );
+    localStorage.setItem("user", JSON.stringify(user));
 
-      setUser(user);
+    setUser(user);
 
-    } catch (error) {
+  } catch (error) {
 
-      console.log(error);
+    console.log(error);
 
-      alert("Google Login Failed");
+    alert(error.message);
 
-    }
-  };
+  }
+
+};
 
   return (
 

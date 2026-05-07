@@ -1,17 +1,13 @@
 import { initializeApp } from "firebase/app";
-
-import {
-  getAuth,
-  GoogleAuthProvider,
-} from "firebase/auth";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD5Ol8rN1VGIfb8DliZBkOYIr68Qr3jLeU",
+  apiKey: "YOUR_API_KEY",
   authDomain: "newssense-ai.firebaseapp.com",
-  projectId: "newssense-ai",
-  storageBucket: "newssense-ai.firebasestorage.app",
-  messagingSenderId: "938982542435",
-  appId: "1:938982542435:web:b4fe79997a894b8dc2bc56",
+  projectId: "newsense-ai",
+  storageBucket: "newssense-ai.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID",
 };
 
 const app = initializeApp(firebaseConfig);

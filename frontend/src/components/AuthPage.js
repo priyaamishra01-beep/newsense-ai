@@ -62,7 +62,7 @@ function AuthPage({ setUser }) {
 
       } else {
 
-        alert(data.message);
+      alert(data.message || "Login failed");
 
       }
 
@@ -70,7 +70,7 @@ function AuthPage({ setUser }) {
 
       console.log(error);
 
-      alert("Server error");
+    alert(error.message || "Server error");
 
     }
   };

@@ -11,48 +11,62 @@ function Dashboard({ user, setUser }) {
     fetchNews("india");
   }, []);
 
-  const fetchNews = async (searchText = query) => {
+const fetchNews = async (searchText = query) => {
 
-    if (!searchText.trim()) {
-      alert("Please enter something");
-      return;
+  if (!searchText.trim()) {
+    alert("Please enter something");
+    return;
+  }
+
+  try {
+
+    setLoading(true);
+
+    const res = await fetch(
+      `https://newsense-ai-xzx5.onrender.com/news?q=${searchText}`
+    );
+
+    // CHECK RESPONSE FIRST
+    if (!res.ok) {
+      throw new Error("Backend response failed");
     }
 
-    try {
+    const data = await res.json();
 
-      setLoading(true);
+    console.log(data);
 
-      const res = await fetch(
-  `https://newsense-ai-xzx5.onrender.com/news?q=${searchText}`
-);
+    if (data.articles) {
 
-      const data = await res.json();
+      setArticles(data.articles);
+      setSummaries({});
 
-      if (data.articles) {
+      data.articles.forEach((article, index) => {
 
-        setArticles(data.articles);
-        setSummaries({});
+        if (article.description) {
+          summarize(article.description, index);
+        }
 
-        data.articles.forEach((article, index) => {
+      });
 
-          if (article.description) {
-            summarize(article.description, index);
-          }
+    } else {
 
-        });
-
-      }
-
-    } catch (err) {
-
-      console.log(err);
-
-    } finally {
-
-      setLoading(false);
+      alert("No articles found");
 
     }
-  };
+
+  } catch (err) {
+
+    console.log(err);
+
+    alert(err.message);
+
+  } finally {
+
+    setLoading(false);
+
+  }
+
+};
 
   const summarize = async (text, index) => {
 

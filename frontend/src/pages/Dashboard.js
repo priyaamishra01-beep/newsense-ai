@@ -23,8 +23,8 @@ function Dashboard({ user, setUser }) {
       setLoading(true);
 
       const res = await fetch(
-        `https://newsapi.org/v2/everything?q=${searchText}&pageSize=20&apiKey=18e59d97e65b49bb97a660ad16e7a84a`
-      );
+  `https://newsense-ai-xzx5.onrender.com/news?q=${searchText}`
+);
 
       const data = await res.json();
 

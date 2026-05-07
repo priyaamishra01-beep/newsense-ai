@@ -1,138 +1,102 @@
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import mongoose from "mongoose";
-import OpenAI from "openai";
+import dotenv from "dotenv";
+import axios from "axios";
+import Groq from "groq-sdk";
 
 dotenv.config();
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
 
-/* ===========================
-   🔗 CONNECT TO MONGODB
-=========================== */
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
-mongoose.connect(process.env.MONGO_URI)
+// ================= MONGODB =================
+
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.log("❌ MongoDB Error:", err));
-  
 
-/* ===========================
-   👤 USER SCHEMA
-=========================== */
+// ================= ROOT =================
 
-const userSchema = new mongoose.Schema({
-  email: String,
-  password: String,
+app.get("/", (req, res) => {
+  res.send("NewsSenseAI Backend Running 🚀");
 });
 
-const User = mongoose.model("User", userSchema);
+// ================= NEWS API =================
 
-/* ===========================
-   🔐 SIGNUP API
-=========================== */
+app.get("/news", async (req, res) => {
 
-app.post("/signup", async (req, res) => {
   try {
-    const { email, password } = req.body;
 
-    const existingUser = await User.findOne({ email });
+    const query = req.query.q;
 
-    if (existingUser) {
-      return res.json({ error: "User already exists" });
-    }
+    const response = await axios.get(
+      `https://newsapi.org/v2/everything?q=${query}&pageSize=20&apiKey=${process.env.NEWS_API_KEY}`
+    );
 
-    const newUser = new User({ email, password });
-    await newUser.save();
+    res.json(response.data);
 
-    res.json({ message: "Signup successful" });
+  } catch (error) {
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Signup failed" });
-  }
-});
+    console.log(error);
 
-/* ===========================
-   🔐 LOGIN API
-=========================== */
-
-app.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email, password });
-
-    if (!user) {
-      return res.status(401).json({ error: "Invalid credentials" });
-    }
-
-    res.json({
-      user: {
-        name: user.email,
-        email: user.email,
-      },
-      token: "dummy-token",
+    res.status(500).json({
+      message: "Failed to fetch news",
     });
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Login failed" });
   }
+
 });
 
-/* ===========================
-   🔥 GROQ (AI SUMMARY)
-=========================== */
-
-const client = new OpenAI({
-  apiKey: process.env.GROQ_API_KEY,
-  baseURL: "https://api.groq.com/openai/v1",
-});
-
-/* ===========================
-   🧠 SUMMARIZE API
-=========================== */
+// ================= AI SUMMARY =================
 
 app.post("/summarize", async (req, res) => {
+
   try {
+
     const { text } = req.body;
 
-    if (!text) {
-      return res.status(400).json({ error: "No text provided" });
-    }
+    const chatCompletion = await groq.chat.completions.create({
 
-    const response = await client.chat.completions.create({
-      model: "llama-3.1-8b-instant",
       messages: [
         {
           role: "user",
-          content: `Summarize this news in 2-3 lines:\n${text}`,
+          content: `Summarize this news in simple words:\n${text}`,
         },
       ],
+
+      model: "llama3-8b-8192",
+
     });
 
-    const summary = response.choices[0].message.content;
+    const summary =
+      chatCompletion.choices[0]?.message?.content;
 
     res.json({ summary });
 
   } catch (error) {
-    console.error("ERROR:", error);
 
-    res.json({
-      summary: "Unable to generate summary right now.",
+    console.log(error);
+
+    res.status(500).json({
+      message: "Summarization failed",
     });
+
   }
+
 });
 
-/* ===========================
-   🚀 SERVER START
-=========================== */
-app.get("/", (req, res) => {
-  res.send("NewsSenseAI Backend Running 🚀");
-});
-app.listen(8000, () => {
-  console.log("🚀 Server running on port 8000");
+// ================= START SERVER =================
+
+const PORT = process.env.PORT || 8000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });

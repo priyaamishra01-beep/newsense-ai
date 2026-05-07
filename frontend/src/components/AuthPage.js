@@ -255,22 +255,22 @@ function AuthPage({ setUser }) {
         {/* GOOGLE BUTTON */}
 
         <button
-          onClick={handleGoogleLogin}
-          className="
-            w-full
-            bg-white
-            text-black
-            p-3
-            rounded-lg
-            flex
-            items-center
-            justify-center
-            gap-3
-            hover:bg-slate-200
-            transition-all
-            font-semibold
-          "
-        >
+  onClick={googleLogin}
+  className="
+    w-full
+    bg-white
+    text-black
+    p-3
+    rounded-lg
+    flex
+    items-center
+    justify-center
+    gap-3
+    hover:bg-slate-200
+    transition-all
+    font-semibold
+  "
+>
 
           <img
             src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png"
